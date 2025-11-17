@@ -1,0 +1,8 @@
+<odoo>
+    <record id="seq_hr_professional_card" model="ir.sequence">
+        <field name="name">Carte Professionnelle</field>
+        <field name="code">hr.professional.card</field>
+        <field name="prefix">CARD-</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

@@ -1,0 +1,86 @@
+<odoo>
+    <record id="view_hr_professional_card_tree" model="ir.ui.view">
+        <field name="name">hr.professional.card.tree</field>
+        <field name="model">hr.professional.card</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="matriculepf"/>
+                <field name="profession"/>
+                <field name="blood_group"/>
+                <field name="state"/>
+                <field name="qr_link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_professional_card_form" model="ir.ui.view">
+        <field name="name">hr.professional.card.form</field>
+        <field name="model">hr.professional.card</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="print_card" type="object" string="Imprimer Carte" class="btn-primary"/>
+                    <button name="action_generate_qr" type="object" string="Générer QR Code" 
+                        class="btn-primary" attrs="{'invisible': [('qr_link', '=', False)]}"/>
+                        
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="matriculepf"/>
+                            <field name="profession"/>
+                            <field name="blood_group"/>
+                            <field name="employee_type" invisible="1"/>
+                            <field name="qr_link"/>
+                        </group>
+                        <group attrs="{'invisible': [('employee_type','!=','apprentice')]}">
+                            <field name="apprentice_start_date"/>
+                            <field name="apprentice_end_date"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group>
+                            <!-- Saisie du lien -->
+                            <field name="qr_link" placeholder="https://example.com ou web#id=1&amp;model=hr.employee..."/>
+                            
+                            <!-- Affichage du QR code généré -->
+                            <field name="qr_code" widget="image" string="QR Code Généré" 
+                                   style="width: 150px; height: 150px;"/>
+                        </group>
+                        <group>
+                            <!-- Prévisualisation du lien - CORRIGÉ -->
+                            <div class="o_form_label" style="margin-bottom: 5px;">
+                                Prévisualisation du lien:
+                            </div>
+                            <div style="margin-top: 5px; word-break: break-all; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                                <span t-esc="qr_link"/>
+                            </div>
+                        </group>
+                    </group>
+                    
+                    <field name="issue_date"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_professional_card" model="ir.actions.act_window">
+        <field name="name">Cartes Professionnelles</field>
+        <field name="res_model">hr.professional.card</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez vos cartes professionnelles ici.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_hr_professional_card_root" name="RH" sequence="10"/>
+    <menuitem id="menu_hr_professional_card" name="Cartes Professionnelles" parent="menu_hr_professional_card_root" action="action_hr_professional_card" sequence="1"/>
+</odoo>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Format papier personnalisé pour carte -->
+    <record id="paperformat_card" model="report.paperformat">
+        <field name="name">Carte Professionnelle</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">54</field>
+        <field name="page_width">86</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">300</field>
+    </record>
+
+    <template id="report_hr_professional_card">
+        <t t-call="web.html_container">
+        
+            <t t-set="data_report_landscape" t-value="True"/>
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <t t-foreach="docs" t-as="doc">
+                <div class="page" style="width: 8.56cm; height: 5.398cm; margin: 0 auto; page-break-after: always;">
+                    
+                    <!-- Badge CITA Complet avec informations employé -->
+                    <div class="cita-badge" style="
+                      position: relative;
+                      width: 100%;
+                      height: 100%;
+                      background: white;
+                      border-radius: 12px;
+                      overflow: hidden;
+                      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 
+                                  0 10px 10px -5px rgba(0,0,0,0.04);
+                      page-break-inside: avoid;
+                      font-family: 'Calibri', 'Segoe UI', 'Arial', sans-serif
+                    ">
+                      
+                      <!-- Logo CITA -->
+                      <div style="
+                        position: absolute;
+                        top: 15px;
+                        left: 15px;
+                        z-index: 20;
+                      ">
+                        <t t-set="company_logo" t-value="doc.get_company_logo()"/>
+                        <t t-if="company_logo">
+                          <img t-att-src="'data:image/png;base64,%s' % company_logo.decode('utf-8')"
+                               alt="CITA Logo" 
+                               style="
+                                 height: 45px;
+                                 width: auto;
+                                 filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+                               "/>
+                        </t>
+                        <t t-else="">
+                          <div style="
+                            background: linear-gradient(135deg, #1a7a6e 0%, #2dd4bf 100%);
+                            padding: 6px 14px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px rgba(26, 122, 110, 0.3);
+                          ">
+                            <span style="
+                              color: white;
+                              font-size: 20px;
+                              font-weight: bold;
+                              letter-spacing: 2px;
+                            ">CITA</span>
+                          </div>
+                        </t>
+                      </div>
+                      
+                      <!-- Photo employé -->
+                      <div style="
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        z-index: 20;
+                      ">
+                        <t t-if="doc.employee_id and doc.employee_id.image_1920">
+                          <img t-att-src="'data:image/png;base64,%s' % doc.employee_id.image_1920.decode('utf-8')" 
+                               alt="Photo" 
+                               style="
+                                 width: 70px;
+                                 height: 84px;
+                                 object-fit: cover;
+                                 
+                               "/>
+                        </t>
+                        <t t-else="">
+                          <div style="
+                            width: 70px;
+                            height: 84px;
+                            background: #f1f5f9;
+                            border-radius: 8px;
+                            border: 2px solid #cbd5e1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #94a3b8;
+                            font-size: 11px;
+                          ">Photo</div>
+                        </t>
+                      </div>
+                      
+                      <!-- Informations employé (au centre gauche) -->
+                      <div style="
+                        position: absolute;
+                        top: 78px;
+                        left: 15px;
+                        right: 100px;
+                        z-index: 20;
+                      ">
+                        <div style="
+                          color: #1e293b;
+                          font-size: 16px;
+                          font-weight: bold;
+                          margin-bottom: 3px;
+                          line-height: 1.2;
+                        ">
+                          <t t-if="doc.employee_id">
+                            <t t-set="nom_complet" t-value="doc.employee_id.name.split()"/>
+                            <t t-if="len(nom_complet) >= 2">
+                              <t t-esc="' '.join(nom_complet[1:])"/> <t t-esc="nom_complet[0]"/>
+                            </t>
+                            <t t-else="">
+                              <t t-esc="doc.employee_id.name"/>
+                            </t>
+                            </t>
+                        </div>
+                        <div style="
+                          color: #475569;
+                          font-size: 12px;
+                          margin-bottom: 6px;
+                        ">
+                          <t t-esc="doc.profession or 'Poste'"/>
+                        </div>
+                        
+                      </div>
+                      <div style="
+                          color: white;
+                          font-size: 10px;
+                          position: absolute;
+                        top: 172px;
+                        right: 100px;
+                        z-index: 20;
+                          ">
+                          ID: <span style="font-weight: bold; color: #ffffffff;">
+                            <t t-esc="doc.matriculepf or doc.name or '0000'"/>
+                          </span>
+                        </div>
+                       
+                          
+                      
+                      <!-- Groupe sanguin (en haut à droite sous la photo) -->
+                      <div style="
+                        position: absolute;
+                        top: 163px;
+                        right: 15px;
+                        z-index: 20;
+                      ">
+                        <div style="
+                          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                          padding: 4px 12px;
+                          border-radius: 6px;
+                          box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+                        ">
+                          <span style="
+                            color: white;
+                            font-size: 18px;
+                            font-weight: bold;
+                          ">
+                            <t t-if="doc.blood_group and doc.blood_group != 'GS'">
+                              <t t-esc="doc.blood_group"/>
+                            </t>
+                            <t t-else="">GS</t>
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <!-- QR Code (en bas gauche) -->
+                      <div style="
+                        position: absolute;
+                        bottom: 15px;
+                        left: 15px;
+                        z-index: 20;
+                      ">
+                        <div style="
+                          background: white;
+                          padding: 3px;
+                          display: inline-block;
+                          border-radius: 4px;
+                          border: 2px solid #1a7a6e;
+                          box-shadow: 0 2px 4px rgba(26, 122, 110, 0.2);
+                        ">
+                          <t t-if="doc.qr_code">
+                            <img t-att-src="'data:image/png;base64,%s' % doc.qr_code.decode('utf-8')"
+                                 style="width: 45px; height: 45px; display: block;"/>
+                          </t>
+                          <t t-else="">
+                            <div style="
+                              width: 45px;
+                              height: 45px;
+                              background: #f1f5f9;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              color: #94a3b8;
+                              font-size: 9px;
+                            ">QR</div>
+                          </t>
+                        </div>
+                        <!-- Badge SCAN ME -->
+                        
+                      </div>
+                      
+                      <!-- Forme triangle diagonale en SVG -->
+                      <svg style="
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  " viewBox="0 0 350 220" preserveAspectRatio="none">
+    <path d="M 0 220 L 0 215 L 350 135 L 350 220 Z" fill="#1a7a6e" />
+  </svg>
+                      
+                      <!-- Informations supplémentaires en bas à droite -->
+                      
+                      
+                    </div>
+                    
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report 
+        id="action_report_hr_professional_card"
+        name="carte.report_hr_professional_card"
+        model="hr.professional.card"
+        report_type="qweb-pdf"
+        string="Carte Professionnelle CITA"
+        file="carte.report_hr_professional_card"
+        paperformat="paperformat_card"
+    />
+   
+   
+</odoo>
