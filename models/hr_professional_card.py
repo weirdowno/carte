@@ -40,6 +40,10 @@ class HrProfessionalCard(models.Model):
     def print_card(self):
      return self.env.ref('carte.action_report_hr_professional_card').report_action(self)            
     
+    def print_release(self):
+        """Imprimer la décharge de remise de badge"""
+        return self.env.ref('carte.action_report_hr_professional_card_release').report_action(self)
+    
     def _generate_qr_code(self):
         """Génère le QR code à partir du lien saisi"""
         for card in self:
@@ -62,15 +66,6 @@ class HrProfessionalCard(models.Model):
                     card.qr_code = False
             else:
                 card.qr_code = False
-    
-    @api.onchange('qr_link')
-    def _onchange_qr_link(self):
-        """Génère le QR code automatiquement quand le lien change"""
-        self._generate_qr_code()
-    
-    def action_generate_qr(self):
-        """Bouton pour générer manuellement le QR code"""
-        self._generate_qr_code()
     
     # Champs
     qr_link = fields.Char(string="Lien pour QR Code", help="Saisissez le lien à encoder dans le QR code")
