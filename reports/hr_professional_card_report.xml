@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Format papier personnalisé pour carte -->
     <record id="paperformat_card" model="report.paperformat">
@@ -14,12 +14,11 @@
         <field name="margin_right">0</field>
         <field name="header_line" eval="False"/>
         <field name="header_spacing">0</field>
-        <field name="dpi">300</field>
+        <field name="dpi">150</field>
     </record>
 
     <template id="report_hr_professional_card">
         <t t-call="web.html_container">
-        
             <t t-set="data_report_landscape" t-value="True"/>
             <head>
                 <meta charset="UTF-8"/>
@@ -38,7 +37,7 @@
                       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 
                                   0 10px 10px -5px rgba(0,0,0,0.04);
                       page-break-inside: avoid;
-                      font-family: 'Calibri', 'Segoe UI', 'Arial', sans-serif
+                      font-family: 'Calibri', 'Segoe UI', 'Arial', sans-serif;
                     ">
                       
                       <!-- Logo CITA -->
@@ -89,7 +88,9 @@
                                  width: 70px;
                                  height: 84px;
                                  object-fit: cover;
-                                 
+                                 border-radius: 8px;
+                                 border: 2px solid #cbd5e1;
+                                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                                "/>
                         </t>
                         <t t-else="">
@@ -124,40 +125,32 @@
                           line-height: 1.2;
                         ">
                           <t t-if="doc.employee_id">
-                            <t t-set="nom_complet" t-value="doc.employee_id.name.split()"/>
-                            <t t-if="len(nom_complet) >= 2">
-                              <t t-esc="' '.join(nom_complet[1:])"/> <t t-esc="nom_complet[0]"/>
-                            </t>
-                            <t t-else="">
-                              <t t-esc="doc.employee_id.name"/>
-                            </t>
-                            </t>
+                            <t t-esc="doc.employee_id.name"/>
+                          </t>
+                          <t t-else="">Nom Prénom</t>
                         </div>
                         <div style="
-                          color: #475569;
+                          color: #1a7a6e;
                           font-size: 12px;
                           margin-bottom: 6px;
                         ">
                           <t t-esc="doc.profession or 'Poste'"/>
                         </div>
-                        
                       </div>
-                      <div style="
-                          color: white;
-                          font-size: 10px;
-                          position: absolute;
-                        top: 172px;
-                        right: 100px;
-                        z-index: 20;
-                          ">
-                          ID: <span style="font-weight: bold; color: #ffffffff;">
-                            <t t-esc="doc.matriculepf or doc.name or '0000'"/>
-                          </span>
-                        </div>
-                       
-                          
                       
-                      <!-- Groupe sanguin (en haut à droite sous la photo) -->
+                      <!-- ID (en bas à gauche sur le triangle) -->
+                      <div style="
+                        position: absolute;
+                        top: 172px;
+                        left: 85px;
+                        z-index: 20;
+                      ">
+                        <div style="color: white; font-size: 10px; font-weight: bold;">
+                          ID: <t t-esc="doc.matriculepf or doc.name or '0000'"/>
+                        </div>
+                      </div>
+                      
+                      <!-- Groupe sanguin (en bas à droite) -->
                       <div style="
                         position: absolute;
                         top: 163px;
@@ -215,22 +208,25 @@
                             ">QR</div>
                           </t>
                         </div>
-                        <!-- Badge SCAN ME -->
-                        
                       </div>
                       
                       <!-- Forme triangle diagonale en SVG -->
                       <svg style="
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-  " viewBox="0 0 350 220" preserveAspectRatio="none">
-    <path d="M 0 220 L 0 215 L 350 135 L 350 220 Z" fill="#1a7a6e" />
-  </svg>
-                      
-                      <!-- Informations supplémentaires en bas à droite -->
-                      
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        z-index: 10;
+                      " viewBox="0 0 324 204" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#1a7a6e;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#1a7a6e;stop-opacity:0.9" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M 0 204 L 0 170 L 324 140 L 324 204 Z" fill="url(#triangleGradient)" />
+                      </svg>
                       
                     </div>
                     
@@ -248,6 +244,82 @@
         file="carte.report_hr_professional_card"
         paperformat="paperformat_card"
     />
-   
-   
+    
+    <template id="report_hr_professional_card_release">
+        <t t-call="web.html_container">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <t t-set="current_user" t-value="docs and docs[:1] and docs[:1][0].env.user"/>
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="employee_name" t-value="doc.employee_id and doc.employee_id.name or ''"/>
+                <t t-set="badge_number" t-value="doc.name or ''"/>
+                <t t-set="company_logo" t-value="doc.get_company_logo()"/>
+                <t t-set="release_date" t-value="doc.issue_date or fields.Date.context_today(doc)"/>
+                <div class="page" style="width: 19cm; min-height: 24cm; padding: 2.5cm; font-family: 'Calibri', 'Segoe UI', 'Arial', sans-serif; color: #0f172a; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 20px;">
+                        <div>
+                            <t t-if="company_logo">
+                                <img t-att-src="'data:image/png;base64,%s' % company_logo.decode('utf-8')"
+                                     alt="CITA Logo" style="height: 70px; width: auto;"/>
+                            </t>
+                            <t t-else="">
+                                <div style="font-size: 22px; font-weight: bold; color: #0f172a;">CITA</div>
+                            </t>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <div style="font-size: 26px; font-weight: bold; letter-spacing: 2px;">DÉCHARGE</div>
+                            <div style="margin-top: 8px; font-size: 14px; color: #475569; text-transform: uppercase;">
+                                Badge N° <span style="font-weight: bold; color: #0f172a;">
+                                    <t t-esc="doc.employee_id.matriculepf or '________'"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; font-size: 15px; line-height: 1.6; text-align: justify;">
+                        Je soussigné(e) Mr./Mme
+                        <span style="font-weight: bold; color: #0f172a;">
+                            <t t-esc="current_user.name if current_user else ''"/>
+                        </span>,
+                        atteste avoir remis à M./Mme 
+                        <span style="font-weight: bold; color: #0f172a;">
+                            <t t-esc="employee_name"/> 
+                        </span>
+                          son badge professionnel.
+                    </div>
+
+                    <div style="margin-top: 150; display: flex; justify-content: space-between; gap: 60px; align-items: flex-end; padding-top: 150px;">
+                        <div style="flex: 1; text-align: left;">
+                            <div style="font-weight: bold; text-transform: uppercase; color: #0f172a;">RÉCEPTION (ÉMETTEUR)</div>
+                            <div style="margin-top: 15px; font-size: 13px; line-height: 2;">
+                                Nom : <span style="font-weight: bold;"><t t-esc="current_user.name if current_user else ''"/></span><br/>
+                                Date : <span style="font-weight: bold;"><t t-esc="release_date"/></span><br/>
+                                Signature : ____________________________________________
+                            </div>
+                        </div>
+
+                        <div style="flex: 1; text-align: right;">
+                            <div style="font-weight: bold; text-transform: uppercase; color: #0f172a;">Accusé de réception</div>
+                            <div style="font-size: 12px; color: #475569;">À compléter et retourner à l'émetteur</div>
+                            <div style="margin-top: 20px; font-size: 13px; line-height: 2;">
+                                Nom de l'employé : <t t-esc="employee_name"/><br/>
+                                Date : _________________________<br/>
+                                Signature : ____________________________________________
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report 
+        id="action_report_hr_professional_card_release"
+        name="carte.report_hr_professional_card_release"
+        model="hr.professional.card"
+        report_type="qweb-pdf"
+        string="Décharge Badge Professionnel"
+        file="carte.report_hr_professional_card_release"
+    />
 </odoo>
