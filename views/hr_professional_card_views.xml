@@ -23,8 +23,7 @@
                 <header>
                     <field name="state" widget="statusbar"/>
                     <button name="print_card" type="object" string="Imprimer Carte" class="btn-primary"/>
-                    <button name="action_generate_qr" type="object" string="Générer QR Code" 
-                        class="btn-primary" attrs="{'invisible': [('qr_link', '=', False)]}"/>
+                    <button name="print_release" type="object" string="Imprimer Décharge" class="btn-secondary"/>
                         
                 </header>
                 <sheet>
@@ -35,7 +34,6 @@
                             <field name="profession"/>
                             <field name="blood_group"/>
                             <field name="employee_type" invisible="1"/>
-                            <field name="qr_link"/>
                         </group>
                         <group attrs="{'invisible': [('employee_type','!=','apprentice')]}">
                             <field name="apprentice_start_date"/>
@@ -51,15 +49,6 @@
                             <!-- Affichage du QR code généré -->
                             <field name="qr_code" widget="image" string="QR Code Généré" 
                                    style="width: 150px; height: 150px;"/>
-                        </group>
-                        <group>
-                            <!-- Prévisualisation du lien - CORRIGÉ -->
-                            <div class="o_form_label" style="margin-bottom: 5px;">
-                                Prévisualisation du lien:
-                            </div>
-                            <div style="margin-top: 5px; word-break: break-all; padding: 8px; background: #f8f9fa; border-radius: 4px;">
-                                <span t-esc="qr_link"/>
-                            </div>
                         </group>
                     </group>
                     
@@ -81,6 +70,7 @@
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_hr_professional_card_root" name="RH" sequence="10"/>
-    <menuitem id="menu_hr_professional_card" name="Cartes Professionnelles" parent="menu_hr_professional_card_root" action="action_hr_professional_card" sequence="1"/>
+    <menuitem id="menu_hr_professional_card_root" name="Cartes Professionnelles" sequence="10"/>
+    <menuitem id="menu_hr_professional_card" name="Gestion des Cartes"
+              parent="menu_hr_professional_card_root" action="action_hr_professional_card" sequence="1"/>
 </odoo>
